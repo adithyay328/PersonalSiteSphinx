@@ -1,0 +1,5 @@
+# Ignore vagrant dir
+.vagrant/**
+
+# Ignore terragrunt caches
+terraform/**/.terragrunt-cache/**
