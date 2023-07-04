@@ -11,8 +11,8 @@ changed by changing the "html_title" variable in conf.py -->
 ```{eval-rst}
 .. toctree::
    :hidden:
-   
-   toc_pages/current_work.md
+
+   cool_topics.md
 ```
 
 # Adithya "Adi" Yerramsetty
