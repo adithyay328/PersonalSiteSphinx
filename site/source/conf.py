@@ -29,8 +29,15 @@ author = 'adithyay328'
 # ones.
 extensions = [
     "myst_parser",
-    "sphinx_design"
+    "sphinx_design",
+    "sphinx_sitemap"
 ]
+
+# For the sitemap, need to specify
+# the base url
+html_baseurl = "https://adithyay.com/"
+# the sitemap url scheme
+sitemap_url_scheme = "{link}"
 
 html_title = "Adi's Site"
 

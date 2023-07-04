@@ -5,8 +5,8 @@
 FROM sphinxdoc/sphinx
 
 # Installs python packages that we need
-RUN pip3 install furo sphinx-design myst-parser sphinx-autobuild
+RUN pip3 install furo sphinx-design myst-parser sphinx-autobuild sphinx-sitemap
 
 # Runs our make script, building site HTML
 # CMD cd /app/site; while sleep 2; do make html; done
-CMD cd /app/site; sphinx-autobuild source build/html
+CMD cd /app/site; ls .; sphinx-autobuild source build/html
