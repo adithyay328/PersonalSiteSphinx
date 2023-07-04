@@ -115,7 +115,7 @@ class SiteVersion:
 
       # Now, build the project
       assert(os.system(
-         "cd ../docker && sudo ./DockerRun.sh"
+         "cd ../docker && sudo ./SingleBuild.sh"
       ) == 0)
 
       # Now, delete the old build, if it
