@@ -31,7 +31,7 @@ extensions = [
     "myst_parser"
 ]
 
-html_title = "SphinxSiteTemplate  documentation"
+html_title = "Adi's Site"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
