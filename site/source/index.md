@@ -6,3 +6,6 @@ Start cutomizing from here, adding pages as you wish.
 Right now, you might notice that the sidebar title
 is "SphinxSiteTemplate documentation". This can be
 changed by changing the "html_title" variable in conf.py
+
+## The deployment works!
+Test

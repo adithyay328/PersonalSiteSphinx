@@ -121,9 +121,8 @@ class SiteVersion:
       # Now, delete the old build, if it
       # exists
       if os.path.exists(self.directoryName):
+         print(f"Deleting old build at {self.directoryName}")
          os.system(f"sudo rm -rf {self.directoryName}")
-
-      print(f"Copying build to {self.directoryName}")
       
       # Now, copy the build to the
       # correct directory, after making
