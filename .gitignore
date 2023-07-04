@@ -6,3 +6,6 @@ terraform/**/.terragrunt-cache/**
 
 # Ignore JSON files in build
 build/*.json
+
+# Ignore all build artifacts
+site/build/**
