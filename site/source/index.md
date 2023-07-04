@@ -6,6 +6,15 @@ Start cutomizing from here, adding pages as you wish.
 Right now, you might notice that the sidebar title
 is "Adi's Site". This can be
 changed by changing the "html_title" variable in conf.py -->
+
+
+```{eval-rst}
+.. toctree::
+   :hidden:
+   
+   toc_pages/current_work.md
+```
+
 # Adithya "Adi" Yerramsetty
 
 ## Who am I?
