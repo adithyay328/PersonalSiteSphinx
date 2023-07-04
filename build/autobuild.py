@@ -113,6 +113,13 @@ class SiteVersion:
          f"git checkout {self.branchName} && git pull"
       ) == 0)
 
+      # Delete the old build
+      assert(
+         os.system(
+            f"sudo rm -rf ../site/build"
+         ) == 0
+      )
+
       # Now, build the project
       assert(os.system(
          "cd ../docker && sudo ./SingleBuild.sh"
@@ -129,7 +136,7 @@ class SiteVersion:
       # sure that the directory exists
       os.system(f"sudo mkdir -p {self.directoryName}/html")
       assert(os.system(
-         f"sudo cp -r ../site/build/html/* {self.directoryName}/html"
+         f"sudo cp -r ../site/build/* {self.directoryName}/html"
       ) == 0)
 
       # Done!
