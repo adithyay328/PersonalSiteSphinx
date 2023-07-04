@@ -70,24 +70,33 @@ class SiteVersion:
       # the sites-enabled directory, we
       # need to delete that link and
       # delete the nginx file in sites-available
-      if self.nginxConfigFileName in os.listdir("/etc/nginx/sites-enabled"):
-         os.remove("/etc/nginx/sites-enabled/" + self.nginxConfigFileName)
-         os.remove("/etc/nginx/sites-available/" + self.nginxConfigFileName)
+      if self.nginxConfigFileName in os.listdir("/etc/nginx/sites-available"):
+         os.system("sudo rm /etc/nginx/sites-enabled/" + self.nginxConfigFileName)
+         os.system("sudo rm /etc/nginx/sites-available/" + self.nginxConfigFileName)
 
       NEW_NGINX_SITES_AVAILABLE_FILENAME = "/etc/nginx/sites-available/" + self.nginxConfigFileName
       NEW_NGINX_SITES_ENABLED_FILENAME = "/etc/nginx/sites-enabled/" + self.nginxConfigFileName
       
-      # Now, write the nginx config file
-      with open(NEW_NGINX_SITES_AVAILABLE_FILENAME, "w") as nginxConfigFile:
+      # Now, write the nginx config file via a proxy
+      # file, since open can't use root.
+      TEMP_FILENAME = "temp.conf"
+      with open(TEMP_FILENAME, "w") as nginxConfigFile:
          nginxConfigFile.write(self._getNginxConfig())
+            
+      # Now, copy the file to the correct
+      # location
+      assert(os.system(
+         f"sudo cp {TEMP_FILENAME} {NEW_NGINX_SITES_AVAILABLE_FILENAME}"
+      ) == 0)
+
+      os.remove(TEMP_FILENAME)
       
       # Now, create a link to the
       # nginx config file in the
       # sites-enabled directory
-      os.symlink(
-         NEW_NGINX_SITES_AVAILABLE_FILENAME,
-         NEW_NGINX_SITES_ENABLED_FILENAME
-      )
+      assert(os.system(
+         f"sudo ln -s {NEW_NGINX_SITES_AVAILABLE_FILENAME} {NEW_NGINX_SITES_ENABLED_FILENAME}"
+      ) == 0)
 
       # Done!
 
@@ -106,22 +115,22 @@ class SiteVersion:
 
       # Now, build the project
       assert(os.system(
-         "cd ../docker && ./DockerRun.sh"
+         "cd ../docker && sudo ./DockerRun.sh"
       ) == 0)
 
       # Now, delete the old build, if it
       # exists
       if os.path.exists(self.directoryName):
-         os.system(f"rm -rf {self.directoryName}")
+         os.system(f"sudo rm -rf {self.directoryName}")
 
       print(f"Copying build to {self.directoryName}")
       
       # Now, copy the build to the
       # correct directory, after making
       # sure that the directory exists
-      os.system(f"mkdir -p {self.directoryName}/html")
+      os.system(f"sudo mkdir -p {self.directoryName}/html")
       assert(os.system(
-         f"cp -r ../site/build/html/* {self.directoryName}/html"
+         f"sudo cp -r ../site/build/html/* {self.directoryName}/html"
       ) == 0)
 
       # Done!
@@ -134,6 +143,11 @@ class SiteVersion:
       """
       self._writeNginxConfig()
       self._buildAndCopy()
+
+      # Reload nginx
+      assert(os.system(
+         "sudo systemctl restart nginx.service"
+      ) == 0)
 
 def buildAndDeploy(branchName : str, domainName : str) -> None:
    """
