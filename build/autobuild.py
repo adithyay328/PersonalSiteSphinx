@@ -1,38 +1,19 @@
 """
-This script is used to build the project
-automatically as new branches are created,
-and commits are pushed to the repository.
-
-It is supposed to boot on startup, and
-and it will work as follows:
-1. Poll the repository for all branches,
-   and note them in the JSON file used
-   for tracking
-2. For each branch, build the version
-   of the project that is in that
-   branch, and store the build in the
-   correct build directory, also
-   ensuring that the nginx
-   configuration is pushed for that
-   domain
-3. Every minute, check if there are
-   any new commits in any of the
-   branches, and if there are, rebuild
-   the site and mark it as changing.
-4. If a branch is changing, we accelerate
-   the modification checks to once
-   every 5 seconds, and rebuild
-   the site every time a commit is
-   made.
-5. If a branch marked as changing
-   doesn't have a commit for 5
-   minutes, we mark it as non-changing
-   and go back to checking every
-   minute.
+This file defines the low-level
+functionality for building and deploying
+a version of the site from a version
+of the site repo. The job of orchestrating
+and running build jobs is left to a different
+python file that invokes this script in
+multiple processes.
 """
 import os
+import random
+import sys
 
 from jinja2 import Environment, FileSystemLoader
+
+from data import DB, Config, DB_FNAME
 
 class SiteVersion:
    def __init__(self, branchName : str, domainName : str):
@@ -79,7 +60,12 @@ class SiteVersion:
       
       # Now, write the nginx config file via a proxy
       # file, since open can't use root.
-      TEMP_FILENAME = "temp.conf"
+
+      # Generate a random filename
+      TEMP_FILENAME = str(random.randint(0, 10000)) + "temp.conf"
+      if os.path.exists(TEMP_FILENAME):
+         os.remove(TEMP_FILENAME)
+
       with open(TEMP_FILENAME, "w") as nginxConfigFile:
          nginxConfigFile.write(self._getNginxConfig())
             
@@ -113,14 +99,7 @@ class SiteVersion:
          f"git checkout {self.branchName} && git pull"
       ) == 0)
 
-      # Delete the old build
-      assert(
-         os.system(
-            f"sudo rm -rf ../site/build"
-         ) == 0
-      )
-
-      # Now, build the project
+      # Build the project
       assert(os.system(
          "cd ../docker && sudo ./SingleBuild.sh"
       ) == 0)
@@ -153,66 +132,20 @@ class SiteVersion:
       assert(os.system(
          "sudo systemctl restart nginx.service"
       ) == 0)
-
-def buildAndDeploy(branchName : str, domainName : str) -> None:
-   """
-   This function takes in a
-   branch name, and does the
-   following things:
-   1. Builds the project
-      using the docker build
-      script
-   2. Copies the build to the
-      correct directory
-   3. Creates the correct
-      nginx configuration
-      for this site and
-      copies it to the
-      correct directory
-   """
-   # First, change to the right
-   # correct directory and pull
-   # the latest changes
-   assert(os.system(
-      f"git checkout {branchName} && git pull"
-   ) == 0)
-
-   # Now, build the project
-   assert(os.system(
-      "cd ../docker && ./DockerRun.sh"
-   ) == 0)
-
-   # Now, copy the build to the
-   # correct directory; the
-   # directory name convention
-   # we use is:
-   # /var/www/{subdomainname}.{domainname}
-   # For example, if the branch name
-   # is "test" and the domain name is
-   # "example.com", then the directory
-   # name will be:
-   # /var/www/test.example.com, 
-   # and the expected site name
-   # is text.example.com.
-   # There are some special branch names
-   # like "production", which will be
-   # deployed to the root domain.
-
-   directoryName = "/var/www/" + ( f"{branchName}." if branchName != "production" else "" ) + domainName
-
-   assert(os.system(
-      f"cp -r ../site/build/html /var/www/{directoryName}"
-   ) == 0)
-
-   # Now, we need to create the
-   # nginx configuration file
-   # for this site
-
-# Testing the nginx builder
+   
 if __name__ == "__main__":
-   os.system("pip3 install Jinja2")
+   # Get the branch name
+   branchName = sys.argv[1]
 
-   # Build this site on the develop
-   # branch
-   siteVersion = SiteVersion("develop", "adithyay.com")
-   siteVersion.buildAndDeploy()
+   # Get list of domain name aliases
+   # from config
+   config = Config("build.conf")
+   site_names = config.get("site_names")
+
+   # Build each site version
+   for domainName in site_names:
+      # Create a SiteVersion object
+      siteVersion = SiteVersion(branchName, domainName)
+
+      # Build and deploy the site
+      siteVersion.buildAndDeploy()
