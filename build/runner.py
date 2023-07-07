@@ -36,7 +36,6 @@ from jinja2 import Environment, FileSystemLoader
 
 from data import DB, Config, DB_FNAME
 
-
 class SiteVersion:
     """
     This class represents a single
@@ -69,7 +68,7 @@ class SiteVersion:
         for this site, and then runs
         the given command.
         """
-        os.system(f"cd {self.sourceDir}; {command}")
+        os.system(f"cd ../{self.sourceDir}; {command}")
 
     def _getNginxConfig(self) -> str:
         """
@@ -260,6 +259,16 @@ class Runner:
         """
         Runs builds to update the site.
         """
+        # Update the branch names and hashes
+        self.branchNames = self.db.getBranchNames()
+
+        # Create a dict from branch name to
+        # hash
+        self.branchHashes = {}
+        for branchName in self.branchNames:
+            self.branchHashes[branchName] = db.getBranchHash(branchName)
+
+
         # First, do a git pull and get a mapping
         # from branch name to hash
         os.system("git fetch")
