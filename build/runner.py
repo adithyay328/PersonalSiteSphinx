@@ -31,7 +31,6 @@ import threading
 import time
 
 import git
-import schedule
 from jinja2 import Environment, FileSystemLoader
 
 from data import DB, Config, DB_FNAME
@@ -233,6 +232,9 @@ class Runner:
         self.elevated = False
         self.elevatedTime = datetime.utcnow()
 
+        # A list storing threads to wait on
+        self.threads = []
+
     def _runBuildForBranch(self, branchName: str):
         """
         Builds a branch and does all deployment
@@ -360,14 +362,18 @@ class Runner:
             if (datetime.utcnow() - self.elevatedTime).total_seconds() > 60:
                 self.elevated = False
             else:
-                # If we're elevated, run every 5 seconds
-                schedule.every(5).seconds.do(self.runIter)
-                return schedule.CancelJob
+                # If we're elevated, run in 5 seconds
+                timer = threading.Timer(5, self.runIter)
+                timer.start()
+
+                self.threads.append(timer)
         
         # If we made it here, we're not elevated
         # and we should run every minute
-        schedule.every(1).minutes.do(self.runIter)
-        return schedule.CancelJob
+        timer = threading.Timer(60, self.runIter)
+        timer.start()
+
+        self.threads.append(timer)
 
 if __name__ == "__main__":
     # Construct a runner and let
@@ -379,5 +385,4 @@ if __name__ == "__main__":
     runner.runIter()
 
     while True:
-        schedule.run_pending()
-        time.sleep(1)
+        time.sleep(10)
