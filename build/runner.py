@@ -302,6 +302,13 @@ class Runner:
                 # Add to DB
                 self.db.createBranch(branchName, folderName, mapping[branchName])
 
+                # Build it
+                thread = threading.Thread(
+                    target=self._runBuildForBranch, args=(branchName,)
+                )
+                buildThreads.append(thread)
+                thread.start()
+
                 # Elevate
                 self.elevated = True
                 self.elevatedTime = datetime.utcnow()
@@ -374,61 +381,3 @@ if __name__ == "__main__":
     while True:
         schedule.run_pending()
         time.sleep(1)
-
-
-    # First, run a git fetch and pull
-
-    # TODO: Use the production brach
-    # as the base branch for the
-    # autobuild
-    # os.system("git fetch")
-
-    # # Make a DB against the
-    # # desired file name; pulls
-    # # old data if applicable
-    # db = DB(DB_FNAME)
-
-    # # Make a config object
-    # config = Config("build.conf")
-
-    # # Get the repo url to pull from
-    # repo_url = config.get("repo_url")
-
-    # # Get the branch names from the git repo
-    # repo = git.Repo("..")
-    # branchNames = [branch.name for branch in repo.branches]
-
-    # # First, create new branches that we need in the DB
-    # for branchName in branchNames:
-    #     if branchName not in db.getBranchNames():
-    #         # Generate a new branch name
-    #         # for the branch
-    #         folderName = "sphinxbuild_" + str(random.randint(0, 1000000000))
-
-    #         # Create the branch
-    #         os.system(
-    #             f"cd ..; mkdir -p {folderName}; cd {folderName}; git clone {repo_url} ."
-    #         )
-
-    #         # Add the branch to the DB
-    #         db.createBranch(branchName, folderName)
-
-    # # Now, delete branches that are in the DB, but not
-    # # in the git repo
-    # for branchName in db.getBranchNames():
-    #     if branchName not in branchNames:
-    #         # Delete the branch
-    #         os.system(f"cd ..; rm -rf {db.getBranchFolderName(branchName)}")
-
-    #         # Remove the branch from the DB
-    #         db.removeBranch(branchName)
-
-    # # At this point, we can start queing up
-    # # autobuilds for each branch; once
-    # # an autobuild is complete,
-    # # it needs to schedule another
-    # # build, which is timed base on whether
-    # # or not it's a changing build. This
-    # # can be handled nicely by invoking
-    # # a member function on a deployment
-    # # class
