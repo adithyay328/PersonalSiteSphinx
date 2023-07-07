@@ -134,18 +134,12 @@ class SiteVersion:
       ) == 0)
    
 if __name__ == "__main__":
-   # Get the branch name
+   # Get the branch name and domain name
    branchName = sys.argv[1]
+   domainName = sys.argv[2]
 
-   # Get list of domain name aliases
-   # from config
-   config = Config("build.conf")
-   site_names = config.get("site_names")
+   # Create a SiteVersion object
+   siteVersion = SiteVersion(branchName, domainName)
 
-   # Build each site version
-   for domainName in site_names:
-      # Create a SiteVersion object
-      siteVersion = SiteVersion(branchName, domainName)
-
-      # Build and deploy the site
-      siteVersion.buildAndDeploy()
+   # Build and deploy the site
+   siteVersion.buildAndDeploy()
