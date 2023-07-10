@@ -10,5 +10,7 @@ build/*.json
 # Ignore all build artifacts
 site/build/**
 
-# Ignore sphinxbuild subdirectories
+# Ignore subdirectories for builds
 build/sphinxbuild_*/
+build/branches/**
+build/archive/**

@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "sphinxautobuild"
+version = "0.1.0"
+description = "Auto build scripts for the sphinx site"
+authors = ["Adithya Yerramsetty <adithyay@hotmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+gitpython = "^3.1.31"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
