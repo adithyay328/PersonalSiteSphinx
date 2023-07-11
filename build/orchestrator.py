@@ -59,17 +59,16 @@ if __name__ == "__main__":
 
       # Statup any branch builders that are already built
       for branchNameToRun in ( names.union(currBranchNames) ):
-        # Start a bg thread that runs the corresponding
-        # script
-        bgThreads[branchNameToRun] = subprocess.Popen(f"cd branches/{branchNameToRun}/build; python3 branchBuilder.py", shell=True)
+        if branchNameToRun not in bgThreads:
+          # Start a bg thread that runs the corresponding
+          # script
+          bgThreads[branchNameToRun] = subprocess.Popen(f"cd branches/{branchNameToRun}/build; python3 branchBuilder.py", shell=True)
         
 
       # Create branch folders that are needed
       remoteURL = origin.url
-      print(remoteURL)
       for branchNameToCreate in ( names - currBranchNames ):
-        # Clone the repo into that dir, and checkout
-        # the correct branch
+        # Clone the repo into that dir
         os.system(f"git clone {remoteURL} branches/{branchNameToCreate}")
 
         # Start a bg thread that runs the corresponding
