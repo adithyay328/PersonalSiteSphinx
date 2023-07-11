@@ -16,7 +16,7 @@ def wait(fastPollsTill : datetime):
   currTime = datetime.now(tz=timezone.utc)
 
   if currTime < fastPollsTill:
-    time.sleep(5)
+    time.sleep(10)
   else:
     time.sleep(60)
 
@@ -89,7 +89,4 @@ if __name__ == "__main__":
     prevGitHash = currHash
 
     # Now, wait for the appropriate amount of time
-    if datetime.now(tz=timezone.utc) < fastPollsTill:
-      time.sleep(10)
-    else:
-      time.sleep(60)
+    wait(fastPollsTill)
