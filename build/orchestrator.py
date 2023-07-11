@@ -47,7 +47,8 @@ if __name__ == "__main__":
       remoteURL = origin.url
       print(remoteURL)
       for branchNameToCreate in ( names - currBranchNames ):
-        # Clone the repo into that dir
+        # Clone the repo into that dir, and checkout
+        # the correct branch
         os.system(f"git clone {remoteURL} branches/{branchNameToCreate}")
 
         # Start a bg thread that runs the corresponding
