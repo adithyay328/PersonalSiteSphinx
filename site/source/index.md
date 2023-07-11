@@ -19,23 +19,19 @@ changed by changing the "html_title" variable in conf.py -->
 
 ## Who am I?
 My name's Adi, and I'm a computer science student at ASU.
-My work/research/main interests include
-Monocular Visual SLAM, NeRFs, and other core
-topics in Computer Vision, Robotics and Machine Learning.
+My main interests include Monocular Visual SLAM, NeRFs, and other core topics in Computer Vision, Robotics, and Machine Learning. I currently do undergraduate research, mainly focusing on computer vision, Mono V-SLAM, and occupancy networks. To learn more about specific topics I'm working on, check out [this page](./cool_topics.md)
 
-Outside of these core interests of mine, I find most of 
-CS and Math interesting, and so there might be pages on this site related
-to various topics like data structures, principles of OS design
-and backend design.
+Outside of these core interests of mine, I find most of CS and Math interesting, so there will be some pages on this site related to various topics like data structures, principles of OS design
+and backend infrastructure and design.
 
 ## What do I do?
 Apart from being a student, I currently serve as president of ASU's
-Machine Learning Club, where I was previously the Head of Content; regardless of position, I'm mainly repsonsible for developing technical content and giving
+Machine Learning Club, where I was previously the Head of Content; regardless of position, I'm mainly responsible for developing technical content and giving
 tutorials on cool topics in Machine Learning. Definitely check out our good work over there if you have time!
 
-Beyond this, I somewhat unofficially work with ASU's DREAM Lab and Jnaneshwar Das, mainly working towards research in scene representations, which I work with via monocular SLAM, NeRFs and Occupancy Networks. Some related projects of mine are available on this site, so definitely check those out!
+Beyond this, I somewhat unofficially work with ASU's DREAM Lab and Professor Jnaneshwar Das, mainly working towards research in scene representations, which I work with via monocular SLAM, NeRFs and Occupancy Networks. Some related projects of mine are available on this site, so definitely check those out! See [here](./cool_topics.md) for more details on research topics of mine.
 
 ## Contact Info
-The most reliable way to get in touch with me is probably my LinkedIn, which is linked [here.](https://www.linkedin.com/in/adithya-yerramsetty) I prefer this over e-mail due to a) being less formal and b) allowing blocking of spam contacts and being less spammy overall.
+The most reliable way to get in touch with me is probably my LinkedIn, which is linked [here.](https://www.linkedin.com/in/adithya-yerramsetty)
 
 My ASU email is ayerrams@asu.edu
