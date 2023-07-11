@@ -6,17 +6,31 @@
 import time
 import os
 import subprocess
+import signal
+import sys
 
 import git 
 
+# This is a mapping from
+# branch name to a popen
+# instance. Allows the orchestrator
+# to kill any background processes
+# that are in deleted directories.
+bgThreads = {}
+
+# Handle the ctrl + c signal
+def exitHandler(sig, frame):
+  # Clear the bgThreads
+  for branch, thread in bgThreads.items():
+    thread.kill()
+  # Exit
+  sys.exit(0)
+    
 if __name__ == "__main__":
-    # This is a mapping from
-    # branch name to a popen
-    # instance. Allows the orchestrator
-    # to kill any background processes
-    # that are in deleted directories.
-    bgThreads = {}
-  
+    # Set the signal handler
+    # for ctrl + c
+    signal.signal(signal.SIGINT, exitHandler)
+
     while True:
       # Do a git fetch,
       # and check all branches
