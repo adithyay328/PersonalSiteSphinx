@@ -9,29 +9,8 @@ from jinja2 import FileSystemLoader, Environment
 
 JSON_CONFIG = "buildConfig.json"
 
-def buildCompleteDomainName(branchName : str, productionBranchName : str):
+def buildCompleteDomainName(branchName : str, productionBranchName : str, domainName : str):
   return ( f"{branchName}." if branchName != productionBranchName else ""  ) + domainName
-
-def makeNginxConfig(branchName : str, domainName : str, productionBranchName : str):
-  # Use jinja to generate the
-  # nginx configuration file
-  # for this site
-  TEMPLATE_FILE = "nginxTemplate.conf"
-  loader = FileSystemLoader(searchpath="./")
-
-  completeDomainName = buildCompleteDomainName(branchName, productionBranchName)
-
-  # Here is the context we use
-  # to generate the nginx
-  # configuration text
-  context = {
-     "SITE_HTML_DIR" : f"/var/www/{completeDomainName}",
-     "COMPLETE_DOMAIN_NAME" : completeDomainName
-  }
-
-  # Now, render and return
-  template = Environment(loader=loader).get_template(TEMPLATE_FILE)
-  return template.render(context)
 
 def wait(fastPollsTill : datetime):
   currTime = datetime.now(tz=timezone.utc)
@@ -88,17 +67,22 @@ if __name__ == "__main__":
     # If hash is different, we need to run the build process
 
     # First, run the docker command to build this clone of the site
-    os.system("cd ../docker; ./SingleBuild.sh")
+    os.system("cd ../docker; sudo ./SingleBuild.sh")
     
     # At this point, all we need to do is copy the
     # build to the right place
     for domainName in configO["domain_names"]:
+      completeDName = buildCompleteDomainName(branchName, prodBranchName, domainName)
       # If domain name is already in the dir, delete it
-      if buildCompleteDomainName(domainName, prodBranchName) in os.listdir("/var/www"):
-        os.system(f"rm -rf /var/www/{buildCompleteDomainName(domainName, prodBranchName)}")
+      if completeDName in os.listdir("/var/www"):
+        os.system(f"sudo rm -rf /var/www/{completeDName}")
+
+      # Make dir
+      os.system(f"sudo mkdir -p /var/www/{completeDName}")
 
       # Copy
-      os.system(f"cp -r ../site/build /var/www/{buildCompleteDomainName(domainName, prodBranchName)}")    
+      os.system(f"sudo cp -r ../site/build /var/www/{completeDName}/html")
+
       # Done in this domain
 
     # Update hash
@@ -106,6 +90,6 @@ if __name__ == "__main__":
 
     # Now, wait for the appropriate amount of time
     if datetime.now(tz=timezone.utc) < fastPollsTill:
-      time.sleep(5)
+      time.sleep(10)
     else:
       time.sleep(60)
