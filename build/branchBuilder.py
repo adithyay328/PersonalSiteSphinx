@@ -70,7 +70,8 @@ if __name__ == "__main__":
   
     # Checkout the correct branch, and pull. This
     # is based on the current branch name
-    branchName = os.path.basename(os.getcwd())
+    branchName = os.path.basename(os.path.dirname(os.getcwd()))
+    # branchName = os.path.basename(os.getcwd())
     os.system(f"git checkout -B {branchName}; git pull -f origin {branchName}")
 
     # Check if the hash has changed; if not, continue

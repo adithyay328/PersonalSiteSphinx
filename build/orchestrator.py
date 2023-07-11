@@ -41,7 +41,14 @@ if __name__ == "__main__":
           bgThreads[branchNameToDelete].kill()
           del bgThreads[branchNameToDelete]
 
-      os.system(f"rm -rf branches/{branchNameToDelete}")
+        os.system(f"rm -rf branches/{branchNameToDelete}")
+
+      # Statup any branch builders that are already built
+      for branchNameToRun in ( names.union(currBranchNames) ):
+        # Start a bg thread that runs the corresponding
+        # script
+        bgThreads[branchNameToRun] = subprocess.Popen(f"cd branches/{branchNameToRun}/build; python3 branchBuilder.py", shell=True)
+        
 
       # Create branch folders that are needed
       remoteURL = origin.url
@@ -53,7 +60,7 @@ if __name__ == "__main__":
 
         # Start a bg thread that runs the corresponding
         # script
-        bgThreads[branchNameToCreate] = subprocess.Popen(f"python3 branches/{branchNameToCreate}/build/branchBuilder.py")
+        bgThreads[branchNameToCreate] = subprocess.Popen(f"cd branches/{branchNameToCreate}/build; python3 branchBuilder.py", shell=True)
 
       # This script runs forever,
       # so just sleep for 60 seconds
