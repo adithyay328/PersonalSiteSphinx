@@ -25,6 +25,7 @@ def wait(fastPollsTill : datetime):
 
 # On sigint, exit
 def exitHandler(sig, frame):
+  print("EXITING!!!")
   sys.exit(0)
 
 if __name__ == "__main__":

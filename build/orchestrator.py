@@ -22,9 +22,10 @@ bgThreads = {}
 def exitHandler(sig, frame):
   # Clear the bgThreads
   for branch, thread in bgThreads.items():
-    #thread.kill()
+    thread.kill()
     # Send kill signal
-    os.killpg(os.getpgid(thread.pid), signal.SIGINT)
+    # os.killpg(os.getpgid(thread.pid), signal.SIGKILL)
+    #os.kill(os.getpgid(thread.pid), signal.SIGTERM)
   
   # Exit
   sys.exit(0)
@@ -66,7 +67,9 @@ if __name__ == "__main__":
         if branchNameToRun not in bgThreads:
           # Start a bg thread that runs the corresponding
           # script
-          bgThreads[branchNameToRun] = subprocess.Popen(f"cd branches/{branchNameToRun}/build; python3 branchBuilder.py", shell=True, preexec_fn=os.setsid)
+          os.chdir(os.path.abspath(os.path.expanduser(f'branches/{branchNameToRun}/build')))
+          bgThreads[branchNameToRun] = subprocess.Popen(f"python3 branchBuilder.py".split())
+          os.chdir(os.path.abspath(os.path.expanduser('../../../')))
         
 
       # Create branch folders that are needed
@@ -77,7 +80,9 @@ if __name__ == "__main__":
 
         # Start a bg thread that runs the corresponding
         # script
-        bgThreads[branchNameToCreate] = subprocess.Popen(f"cd branches/{branchNameToCreate}/build; python3 branchBuilder.py", shell=True, preexec_fn=os.setsid)
+        os.chdir(os.path.abspath(os.path.expanduser(f'branches/{branchNameToRun}/build')))
+        bgThreads[branchNameToCreate] = subprocess.Popen(f"python3 branchBuilder.py".split())
+        os.chdir(os.path.abspath(os.path.expanduser('../../../')))
 
       # This script runs forever,
       # so just sleep for 60 seconds
