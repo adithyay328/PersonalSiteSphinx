@@ -22,7 +22,10 @@ bgThreads = {}
 def exitHandler(sig, frame):
   # Clear the bgThreads
   for branch, thread in bgThreads.items():
-    thread.kill()
+    #thread.kill()
+    # Send kill signal
+    os.killpg(os.getpgid(thread.pid), signal.SIGINT)
+  
   # Exit
   sys.exit(0)
     
@@ -57,23 +60,24 @@ if __name__ == "__main__":
 
         os.system(f"rm -rf branches/{branchNameToDelete}")
 
-      # Statup any branch builders that are already built
+      # Statup any branch builders for folders that are already
+      # cloned
       for branchNameToRun in ( names.union(currBranchNames) ):
         if branchNameToRun not in bgThreads:
           # Start a bg thread that runs the corresponding
           # script
-          bgThreads[branchNameToRun] = subprocess.Popen(f"cd branches/{branchNameToRun}/build; python3 branchBuilder.py", shell=True)
+          bgThreads[branchNameToRun] = subprocess.Popen(f"cd branches/{branchNameToRun}/build; python3 branchBuilder.py", shell=True, preexec_fn=os.setsid)
         
 
       # Create branch folders that are needed
       remoteURL = origin.url
       for branchNameToCreate in ( names - currBranchNames ):
         # Clone the repo into that dir
-        os.system(f"git clone {remoteURL} branches/{branchNameToCreate}")
+        os.system(f"git clone --single-branch --branch {branchNameToCreate} {remoteURL} branches/{branchNameToCreate}")
 
         # Start a bg thread that runs the corresponding
         # script
-        bgThreads[branchNameToCreate] = subprocess.Popen(f"cd branches/{branchNameToCreate}/build; python3 branchBuilder.py", shell=True)
+        bgThreads[branchNameToCreate] = subprocess.Popen(f"cd branches/{branchNameToCreate}/build; python3 branchBuilder.py", shell=True, preexec_fn=os.setsid)
 
       # This script runs forever,
       # so just sleep for 60 seconds

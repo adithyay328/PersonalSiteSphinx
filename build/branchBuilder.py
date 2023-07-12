@@ -3,6 +3,8 @@ import subprocess
 from datetime import datetime, timedelta, timezone
 import time
 import json
+import signal
+import sys
 
 import git
 from jinja2 import FileSystemLoader, Environment
@@ -19,6 +21,11 @@ def wait(fastPollsTill : datetime):
     time.sleep(10)
   else:
     time.sleep(60)
+
+
+# On sigint, exit
+def exitHandler(sig, frame):
+  sys.exit(0)
 
 if __name__ == "__main__":
   # When ran by itself, this script
@@ -38,6 +45,9 @@ if __name__ == "__main__":
   fastPollsTill : datetime = datetime.now(tz=timezone.utc) - timedelta(seconds=1)
   prevGitHash = "" 
 
+  # Set signal handler for ctrl + c
+  signal.signal(signal.SIGINT, exitHandler)
+
   while True:
     # Get the current config
     configS = ""
@@ -47,11 +57,9 @@ if __name__ == "__main__":
 
     prodBranchName = configO["production_branch"]
   
-    # Checkout the correct branch, and pull. This
-    # is based on the current branch name
+    # Reset to the correct upstream commit    
     branchName = os.path.basename(os.path.dirname(os.getcwd()))
-    # branchName = os.path.basename(os.getcwd())
-    os.system(f"git checkout -B {branchName}; git pull -f origin {branchName}")
+    os.system(f"git fetch --all; git reset --hard origin/{branchName}")
 
     # Check if the hash has changed; if not, continue
     repo = git.Repo("..")
@@ -61,6 +69,7 @@ if __name__ == "__main__":
 
     if currHash == prevGitHash:
       wait(fastPollsTill)
+      continue
     else:
       fastPollsTill = datetime.now(tz=timezone.utc) + timedelta(minutes=1)
 
