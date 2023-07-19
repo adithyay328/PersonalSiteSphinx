@@ -1,4 +1,6 @@
 {
   "domain_names" : ["adiy.io", "adithyay.com"],
-  "production_branch" : "prod"
+  "production_branch" : "prod",
+  "repo_owner_username" : "adithyay328",
+  "repo_name" : "PersonalSiteSphinx"
 }
