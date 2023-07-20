@@ -2,5 +2,6 @@
   "domain_names" : ["adiy.io", "adithyay.com"],
   "production_branch" : "prod",
   "repo_owner_username" : "adithyay328",
-  "repo_name" : "PersonalSiteSphinx"
+  "repo_name" : "PersonalSiteSphinx",
+  "seconds_between_builds" : 20
 }
