@@ -15,7 +15,7 @@ psutil = "^5.9.5"
 gunicorn = "^21.2.0"
 pygithub = "^1.59.0"
 cryptography = "^41.0.2"
-
+pythongraphrunner = "^1.2.1"
 
 [build-system]
 requires = ["poetry-core"]

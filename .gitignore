@@ -13,7 +13,7 @@ build/branches/**
 build/archive/**
 
 # Ignore sensitive data in builds;
-# these a re stored in .evn and in JSON
+# these are stored in .env and in JSON
 # files
 build/.env
 build/**.json
