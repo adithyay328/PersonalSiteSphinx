@@ -73,6 +73,25 @@ def cloneTask(branch : Branch) -> str:
 # for cloning
 cloneEdge : pythongraphrunner.TaskEdge[Branch] = pythongraphrunner.TaskEdge(["uncloned"], ["cloned"], [], cloneTask)
 
+# In certain cases, the branch is already cloned,
+# but it is out of date w.r.t the remote. In this
+# case, we need to pull the upsteam, and then builds
+# it
+def pullTask(branch : Branch) -> str:
+  """
+  This task pulls the branch,
+  and should return the state 'cloned'
+  """
+  # Run git pull in the branch dir
+  subprocess.run(["git", "pull"], cwd=f"{BRANCH_DIR}/{branch.branchName}", capture_output=True)
+
+  # We're done! Transition to the cloned state
+  return "cloned"
+
+# Now, define the actual TaskEdge
+# for pulling
+pullEdge : pythongraphrunner.TaskEdge[Branch] = pythongraphrunner.TaskEdge(["out_of_date"], ["cloned"], [], pullTask)
+
 # Now, an edge that goes from cloned/cleaned to built. This
 # builds the site
 def buildTask(branch : Branch) -> str:
@@ -130,7 +149,40 @@ def deployTask(branch : Branch) -> str:
 # for deploying
 deployEdge : pythongraphrunner.TaskEdge[Branch] = pythongraphrunner.TaskEdge(["built"], ["deployed"], [], deployTask)
 
+# The last action we can take is to remove
+# a branch from this system. This is done
+# if a branch is placed in the "orphaned"
+# state
+def removeTask(branch : Branch) -> str:
+  """
+  This task removes the branch,
+  and should return the state 'removed'
+  """
+  # First, delete the branch dir
+  subprocess.run(["sudo", "rm", "-rf", f"{BRANCH_DIR}/{branch.branchName}"])
+
+  # Now, remove the branch from the
+  # nginx serving dir
+  buildConfigObj = buildConfig.BuildConfig(buildConfig.BUILD_CONFIG_FNAME)
+  domainNames = buildConfigObj.domainNames
+  productionBranchName = buildConfigObj.productionBranch
+
+  for domain in domainNames:
+    completeDomainName = branch.buildCompleteDomainName(domain, productionBranchName)
+
+    # Delete the old site from the nginx
+    # serving dir, if applicable
+    subprocess.run(["sudo", "rm", "-rf", f"{buildConfig.NGINX_SITE_SERVING_DIR}/{completeDomainName}"])
+
+  # Perfect, now return the removed
+  # state
+  return "removed"
+
+# Now, define the actual TaskEdge
+# for removing
+removeEdge : pythongraphrunner.TaskEdge[Branch] = pythongraphrunner.TaskEdge(["orphaned"], ["removed"], [], removeTask)
+
 # Now, add to the task graph
 taskGraph : pythongraphrunner.TaskGraph[Branch] = pythongraphrunner.TaskGraph()
-taskGraph.addStates( ["uncloned", "cloned", "built", "deployed"] )
-taskGraph.addEdges([cloneEdge, buildEdge, deployEdge])
+taskGraph.addStates( ["uncloned", "out_of_date", "cloned", "built", "deployed", "orphaned", "removed"] )
+taskGraph.addEdges([cloneEdge, pullEdge, buildEdge, deployEdge, removeEdge])

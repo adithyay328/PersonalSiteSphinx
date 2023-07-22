@@ -42,7 +42,7 @@ if __name__ == "__main__":
   
   # Testing: Creating a branch object, and adding it to the task
     # graph
-  branch = taskgraph.Branch("develop", "uncloned", "deployed")
+  branch = taskgraph.Branch("develop", "orphaned", "removed")
   taskgraph.taskGraph.addItem(branch)
 
   print(taskgraph.taskGraph._graph.nodes())
