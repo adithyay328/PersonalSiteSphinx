@@ -61,17 +61,25 @@ if __name__ == "__main__":
     # If any new branches are found, add them to the
     # task graph with state uncloned
     for branchName, sha in remoteBranchesAndSHA.items():
-      if branchName not in mostRecentBranchHashes:
+      if branchName not in mostRecentBranchHashes.keys():
         # Add the branch to the task graph
         newBranch = taskgraph.Branch(branchName, "uncloned", "deployed")
         taskgraph.taskGraph.addItem(newBranch)
       elif sha != mostRecentBranchHashes[branchName]:
+        # Add to the task graph if it is not already there
+        if branchName not in taskgraph.taskGraph.getItemIDs():
+          taskgraph.taskGraph.addItem(taskgraph.Branch(branchName, "uncloned", "deployed"))
+
         # Update the branch state to out_of_date
         taskgraph.taskGraph.updateItemStates(branchName, "out_of_date", "deployed")
     
     # Now, check for orphaned branches
     for branchName in mostRecentBranchHashes.keys():
       if branchName not in remoteBranchesAndSHA:
+        # Add to the task graph if it is not already there
+        if branchName not in taskgraph.taskGraph.getItemIDs():
+          taskgraph.taskGraph.addItem(taskgraph.Branch(branchName, "uncloned", "deployed"))
+
         # Update the branch state to orphaned
         taskgraph.taskGraph.updateItemStates(branchName, "orphaned", "removed")
       
