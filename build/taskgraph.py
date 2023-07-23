@@ -99,12 +99,13 @@ def buildTask(branch : Branch) -> str:
   This task builds the site,
   and should return the state 'built'
   """
+  print("Building branch with name " + branch.branchName)
   # First, get the pwd of the docker
   # build script
-  dockerBuildScriptDir = subprocess.run("cd docker; pwd", capture_output=True, shell=True, cwd=os.path.join(BRANCH_DIR, branch.branchName)).stdout.decode().strip()
+  dockerBuildScriptDir = subprocess.run("cd docker; pwd", capture_output=True, shell=True, cwd=f"{BRANCH_DIR}/{branch.branchName}").stdout.decode().strip()
 
   # Now, run the docker build script
-  subprocess.run(["sudo", "./SingleBuild.sh"], cwd=dockerBuildScriptDir, capture_output=True)
+  subprocess.run(["sudo", "./SingleBuild.sh"], cwd=dockerBuildScriptDir)
 
   # Perfect, now return the built state
   return "built"

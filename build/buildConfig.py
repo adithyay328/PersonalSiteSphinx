@@ -2,7 +2,7 @@ import json
 import os
 
 BUILD_CONFIG_FNAME = "buildConfig.json"
-NGINX_SITE_SERVING_DIR = "/var/www/html"
+NGINX_SITE_SERVING_DIR = "/var/www"
 
 def attemptGetField(fieldName : str, jsonDict : dict):
   """
