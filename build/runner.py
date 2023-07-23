@@ -3,16 +3,22 @@
 from datetime import datetime, timezone, timedelta
 import time
 import json
+import os
 
 import buildConfig
 import githubAPI
 import taskgraph
 
 BRANCH_HASHES_FNAME = "branchHashes.json"
+KEY_FILE = "key.json"
 
 if __name__ == "__main__":
   verified_key = ""
   buildConfigObj = buildConfig.BuildConfig( buildConfig.BUILD_CONFIG_FNAME )
+
+  if KEY_FILE in os.listdir():
+    with open(KEY_FILE) as f:
+      verified_key += f.read()
 
   while verified_key == "":
     key = input("Enter the encryption key: ")
