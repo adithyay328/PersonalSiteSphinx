@@ -50,8 +50,6 @@ if __name__ == "__main__":
     startTime = datetime.now(timezone.utc)
     endTime = startTime + timedelta(seconds=secondsBetweenBuilds)
 
-    print(f"Waiting {secondsBetweenBuilds} seconds between builds...")
-
     # Get the remote branches and SHA hashes
     remoteBranchesAndSHA = githubHandle.getRemoteBranchesAndSHA()
     
@@ -68,7 +66,6 @@ if __name__ == "__main__":
     # task graph with state uncloned
     for branchName, sha in remoteBranchesAndSHA.items():
       if branchName not in mostRecentBranchHashes.keys():
-        print("Cloning branch with name " + branchName)
         # Add the branch to the task graph
         newBranch = taskgraph.Branch(branchName, "uncloned", "deployed")
         taskgraph.taskGraph.addItem(newBranch)
@@ -78,7 +75,6 @@ if __name__ == "__main__":
           taskgraph.taskGraph.addItem(taskgraph.Branch(branchName, "uncloned", "deployed"))
 
         # Update the branch state to out_of_date
-        print("Updating branch with name " + branchName)
         taskgraph.taskGraph.updateItemStates(branchName, "out_of_date", "deployed")
     
     # Now, check for orphaned branches
@@ -89,7 +85,6 @@ if __name__ == "__main__":
           taskgraph.taskGraph.addItem(taskgraph.Branch(branchName, "uncloned", "deployed"))
 
         # Update the branch state to orphaned
-        print("Orphaning branch with name " + branchName)
         taskgraph.taskGraph.updateItemStates(branchName, "orphaned", "removed")
       
     # Now, run the task graph
